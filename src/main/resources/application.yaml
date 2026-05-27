@@ -1,3 +1,19 @@
 spring:
   application:
     name: student-score-system
+  datasource:
+    url: jdbc:mysql://localhost:3306/score_db?useSSL=false&serverTimezone=UTC
+    username: root
+    password: Frj25710209!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  thymeleaf:
+    cache: false    # 开发时关闭缓存
+    prefix: classpath:templates/
+    suffix: .html
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.score.entity
+  configuration:
+    map-underscore-to-camel-case: true
+server:
+  port: 8080
