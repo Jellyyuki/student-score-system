@@ -4,7 +4,13 @@ public class Score {
     private Integer id;
     private Integer studentId;
     private Integer courseId;
-    private Integer score;
+    private Double score;
+
+    // 以下字段用于联查展示
+    private String studentName;
+    private String studentNo;
+    private String courseName;
+    private String courseNo;
 
     //构造方法
     public Score(){
@@ -12,6 +18,7 @@ public class Score {
     }
 
     //getter/setter
+
 
     public Integer getId() {
         return id;
@@ -21,12 +28,12 @@ public class Score {
         this.id = id;
     }
 
-    public Integer getStudentId() {
-        return studentId;
+    public Double getScore() {
+        return score;
     }
 
-    public void setStudentId(Integer studentId) {
-        this.studentId = studentId;
+    public void setScore(Double score) {
+        this.score = score;
     }
 
     public Integer getCourseId() {
@@ -37,12 +44,12 @@ public class Score {
         this.courseId = courseId;
     }
 
-    public Integer getScore() {
-        return score;
+    public Integer getStudentId() {
+        return studentId;
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
+    public void setStudentId(Integer studentId) {
+        this.studentId = studentId;
     }
 
     @Override

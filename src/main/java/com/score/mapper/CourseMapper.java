@@ -23,4 +23,8 @@ public interface CourseMapper {
 
     @Delete("DELETE FROM course WHERE id = #{id}")
     void deleteById(Integer id);
+
+    // 根据课程名称或课程编号模糊查询
+    @Select("SELECT * FROM course WHERE course_name LIKE CONCAT('%', #{keyword}, '%') OR course_no LIKE CONCAT('%', #{keyword}, '%')")
+    List<Course> searchByKeyword(String keyword);
 }
