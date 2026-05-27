@@ -24,4 +24,8 @@ public interface StudentMapper {
 
     @Delete("DELETE FROM student WHERE id = #{id}")
     void deleteById(Integer id);
+
+    // 根据姓名或学号模糊查询
+    @Select("SELECT * FROM student WHERE name LIKE CONCAT('%', #{keyword}, '%') OR student_no LIKE CONCAT('%', #{keyword}, '%')")
+    List<Student> search(@Param("keyword") String keyword);
 }
