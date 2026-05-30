@@ -21,6 +21,10 @@ public class LoginController {
     public String loginPage() {
         return "login";
     }
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/login";
+    }
 
     // 处理登录请求
     @PostMapping("/login")

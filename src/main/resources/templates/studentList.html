@@ -57,32 +57,152 @@
             margin: 0 2px;
             display: inline-block;
             font-size: 13px;
+            cursor: pointer;
+            border: none;
         }
         .btn-danger { background-color: #d9534f; color: white; }
         .btn-danger:hover { background-color: #c9302c; }
         .btn-primary { background-color: #337ab7; color: white; }
         .btn-primary:hover { background-color: #286090; }
-        .btn-success { background-color: #46acac; color: white; }
-        .btn-success:hover { background-color: #368a8a; }
+        .btn-success { background-color: #5cb85c; color: white; }
+        .btn-success:hover { background-color: #4cae4c; }
+        .btn-info { background-color: #5bc0de; color: white; }
+        .btn-info:hover { background-color: #31b0d5; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-reset:hover { background-color: #5a6268; }
         .search-box {
             margin: 20px 0;
             display: flex;
             align-items: center;
             gap: 10px;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
-        .search-box input {
-            width: 300px;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 6px;
+        .search-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .search-box input, .search-box select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
             border: 1px solid #ccc;
         }
-        .search-box .btn {
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 6px;
-        }
+        .search-box input { width: 200px; }
+        .search-box select { width: 150px; }
+        .search-box .btn { padding: 8px 15px; font-size: 14px; border-radius: 4px; }
         h2 { margin-bottom: 10px; color: #2c3e50; }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1abc9c;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-header h3 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .student-info {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .student-info span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .score-table {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .score-table th {
+            background-color: #1abc9c;
+            color: white;
+            padding: 8px;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .summary-item {
+            flex: 1;
+        }
+        .summary-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .no-score {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
     </style>
 </head>
 <body>
@@ -98,33 +218,167 @@
     </div>
     <div class="main-content">
         <h2>学生信息列表</h2>
+        <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
         <div class="search-box">
-            <form method="get" action="/students/list" style="display: flex; gap: 10px;">
-                <input type="text" name="keyword" placeholder="输入姓名或学号" th:value="${keyword}" />
-                <button type="submit" class="btn btn-primary">查询</button>
-            </form>
-            <a href="/students/add" class="btn btn-primary">添加学生</a>
+            <div class="search-left">
+                <form method="get" action="/students/list" style="display: flex; gap: 10px;">
+                    <input type="text" name="keyword" placeholder="姓名/学号" th:value="${keyword}" />
+                    <select name="className">
+                        <option value="">全部班级</option>
+                        <option th:each="c : ${classList}" th:value="${c}" th:text="${c}" th:selected="${c == className}"></option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <a href="/students/list" class="btn btn-reset">重置</a>
+                </form>
+            </div>
+            <a href="/students/add" class="btn btn-success">添加学生</a>
         </div>
+
         <table>
             <thead>
-            <tr><th>ID</th><th>学号</th><th>姓名</th><th>性别</th><th>出生日期</th><th>班级</th><th>操作</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>出生日期</th>
+                <th>班级</th>
+                <th>操作</th>
+            </tr>
             </thead>
             <tbody>
-            <tr th:each="stu : ${students}">
-                <td th:text="${stu.id}"></td>
-                <td th:text="${stu.studentNo}"></td>
-                <td th:text="${stu.name}"></td>
-                <td th:text="${stu.gender}"></td>
-                <td th:text="${#temporals.format(stu.birthDate, 'yyyy-MM-dd')}"></td>
-                <td th:text="${stu.className}"></td>
+            <tr th:each="s : ${students}">
+                <td th:text="${s.id}">?<\/td>
+                <td th:text="${s.studentNo}">?<\/td>
+                <td th:text="${s.name}">?<\/td>
+                <td th:text="${s.gender}">?<\/td>
+                <td th:text="${s.birthDate}">?<\/td>
+                <td th:text="${s.className}">?<\/td>
                 <td>
-                    <a th:href="@{/students/edit/{id}(id=${stu.id})}" class="btn btn-primary">编辑</a>
-                    <a th:href="@{/students/delete/{id}(id=${stu.id})}" class="btn btn-danger" onclick="return confirm('确定删除吗？')">删除</a>
+                    <a th:href="@{/students/edit/{id}(id=${s.id})}" class="btn btn-primary">编辑</a>
+                    <a th:href="@{/students/delete/{id}(id=${s.id})}" class="btn btn-danger" onclick="return confirm('确定删除该学生吗？')">删除</a>
+                    <button class="btn btn-info score-btn" th:data-id="${s.id}" th:data-name="${s.name}">成绩单</button>
                 </td>
+            </tr>
+            <tr th:if="${students.empty}">
+                <td colspan="7" style="text-align: center; color: #999;">暂无学生数据，请点击"添加学生"<\/td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- 成绩单弹窗 -->
+<div id="scoreModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📊 学生成绩单</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div id="modalBody">
+            <div class="student-info" id="studentInfo">
+                <div><span>学号：</span> <span id="infoNo"></span></div>
+                <div><span>姓名：</span> <span id="infoName"></span></div>
+                <div><span>班级：</span> <span id="infoClass"></span></div>
+            </div>
+            <table class="score-table" border="1" cellpadding="8" cellspacing="0">
+                <thead>
+                <tr><th>课程编号</th><th>课程名称</th><th>学分</th><th>成绩</th><th>等级</th></tr>
+                </thead>
+                <tbody id="scoreTableBody"></tbody>
+            </table>
+            <div class="summary" id="summary">
+                <div class="summary-item"><div class="summary-value" id="courseCount">0</div><div class="summary-label">课程数</div></div>
+                <div class="summary-item"><div class="summary-value" id="totalScore">0</div><div class="summary-label">总分</div></div>
+                <div class="summary-item"><div class="summary-value" id="avgScore">0</div><div class="summary-label">平均分</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 获取成绩单弹窗元素
+    var modal = document.getElementById('scoreModal');
+    var closeBtn = document.getElementsByClassName('close')[0];
+
+    // 关闭弹窗
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // 点击弹窗外部关闭
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // 为所有成绩单按钮绑定点击事件
+    document.querySelectorAll('.score-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var studentId = this.getAttribute('data-id');
+            var studentName = this.getAttribute('data-name');
+
+            // 显示弹窗
+            modal.style.display = "block";
+
+            // 清空旧数据
+            document.getElementById('infoNo').innerText = '';
+            document.getElementById('infoName').innerText = studentName;
+            document.getElementById('infoClass').innerText = '';
+            document.getElementById('scoreTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;">加载中...</td></tr>';
+            document.getElementById('courseCount').innerText = '0';
+            document.getElementById('totalScore').innerText = '0';
+            document.getElementById('avgScore').innerText = '0';
+
+            // AJAX 获取数据
+            fetch('/students/scoreSummary/' + studentId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        // 填写学生信息
+                        document.getElementById('infoNo').innerText = data.studentNo || '';
+                        document.getElementById('infoClass').innerText = data.className || '';
+
+                        // 填写成绩表格
+                        var tbody = document.getElementById('scoreTableBody');
+                        tbody.innerHTML = '';
+
+                        if (data.courseScores && data.courseScores.length > 0) {
+                            data.courseScores.forEach(function(cs) {
+                                var row = tbody.insertRow();
+                                row.insertCell(0).innerText = cs.courseNo || '';
+                                row.insertCell(1).innerText = cs.courseName || '';
+                                row.insertCell(2).innerText = cs.credit || '';
+                                row.insertCell(3).innerText = cs.score || '';
+                                // 等级判断
+                                var score = cs.score;
+                                var level = '';
+                                if (score >= 90) level = '优秀';
+                                else if (score >= 80) level = '良好';
+                                else if (score >= 70) level = '中等';
+                                else if (score >= 60) level = '及格';
+                                else level = '不及格';
+                                row.insertCell(4).innerHTML = '<span style="color:' + (score >= 60 ? '#5cb85c' : '#d9534f') + ';font-weight:bold;">' + level + '</span>';
+                            });
+                        } else {
+                            tbody.innerHTML = '<tr><td colspan="5" class="no-score">暂无成绩数据</td></tr>';
+                        }
+
+                        // 填写汇总
+                        document.getElementById('courseCount').innerText = data.courseCount || 0;
+                        document.getElementById('totalScore').innerText = data.totalScore || 0;
+                        document.getElementById('avgScore').innerText = (data.avgScore || 0) + '分';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('scoreTableBody').innerHTML = '<tr><td colspan="5" class="no-score">加载失败，请重试</td></tr>';
+                });
+        });
+    });
+</script>
 </body>
 </html>
