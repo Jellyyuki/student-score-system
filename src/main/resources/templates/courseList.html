@@ -57,32 +57,83 @@
             margin: 0 2px;
             display: inline-block;
             font-size: 13px;
+            cursor: pointer;
+            border: none;
         }
         .btn-danger { background-color: #d9534f; color: white; }
         .btn-danger:hover { background-color: #c9302c; }
         .btn-primary { background-color: #337ab7; color: white; }
         .btn-primary:hover { background-color: #286090; }
-        .btn-success { background-color: #46acac; color: white; }
-        .btn-success:hover { background-color: #368a8a; }
+        .btn-success { background-color: #5cb85c; color: white; }
+        .btn-success:hover { background-color: #4cae4c; }
+        .btn-warning { background-color: #f0ad4e; color: white; }
+        .btn-warning:hover { background-color: #ec971f; }
         .search-box {
             margin: 20px 0;
             display: flex;
             align-items: center;
             gap: 10px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .search-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .search-box input {
-            width: 300px;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 6px;
+            width: 250px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .search-box select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
             border: 1px solid #ccc;
         }
         .search-box .btn {
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 4px;
         }
         h2 { margin-bottom: 10px; color: #2c3e50; }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-closed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .student-count {
+            font-weight: bold;
+            color: #1abc9c;
+        }
     </style>
 </head>
 <body>
@@ -97,17 +148,39 @@
         </ul>
     </div>
     <div class="main-content">
-        <h2>课程信息列表</h2>
+        <h2>课程列表</h2>
+        <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
         <div class="search-box">
-            <form method="get" action="/courses/list" style="display: flex; gap: 10px;">
-                <input type="text" name="keyword" placeholder="输入课程名称或编号" th:value="${keyword}" />
-                <button type="submit" class="btn btn-primary">查询</button>
-            </form>
-            <a href="/courses/add" class="btn btn-primary">添加课程</a>
+            <div class="search-left">
+                <form method="get" action="/courses/list" style="display: flex; gap: 10px;">
+                    <input type="text" name="keyword" placeholder="输入课程名称或编号" th:value="${keyword}" />
+                    <button type="submit" class="btn btn-primary">查询</button>
+                </form>
+
+                <form method="get" action="/courses/list" style="display: flex; gap: 10px;">
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="">全部</option>
+                        <option value="进行中" th:selected="${currentStatus == '进行中'}">进行中</option>
+                        <option value="已结束" th:selected="${currentStatus == '已结束'}">已结束</option>
+                    </select>
+                </form>
+            </div>
+            <a href="/courses/add" class="btn btn-success">添加课程</a>
         </div>
+
         <table>
             <thead>
-            <tr><th>ID</th><th>课程编号</th><th>课程名称</th><th>学分</th><th>操作</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>课程编号</th>
+                <th>课程名称</th>
+                <th>学分</th>
+                <th>选课人数</th>
+                <th>课程状态</th>
+                <th>操作</th>
+            </tr>
             </thead>
             <tbody>
             <tr th:each="c : ${courses}">
@@ -115,10 +188,19 @@
                 <td th:text="${c.courseNo}"></td>
                 <td th:text="${c.courseName}"></td>
                 <td th:text="${c.credit}"></td>
+                <td class="student-count" th:text="${c.studentCount} + '人'"></td>
+                <td>
+                    <span th:class="${c.status == '进行中'} ? 'status-badge status-active' : 'status-badge status-closed'" th:text="${c.status}"></span>
+                </td>
                 <td>
                     <a th:href="@{/courses/edit/{id}(id=${c.id})}" class="btn btn-primary">编辑</a>
                     <a th:href="@{/courses/delete/{id}(id=${c.id})}" class="btn btn-danger" onclick="return confirm('确定删除该课程吗？')">删除</a>
+                    <a th:if="${c.status == '进行中'}" th:href="@{/courses/updateStatus(id=${c.id}, status='已结束')}" class="btn btn-warning" onclick="return confirm('确定结束该课程吗？')">结束</a>
+                    <a th:if="${c.status == '已结束'}" th:href="@{/courses/updateStatus(id=${c.id}, status='进行中')}" class="btn btn-success" onclick="return confirm('确定重新开课吗？')">开课</a>
                 </td>
+            </tr>
+            <tr th:if="${courses.empty}">
+                <td colspan="7" style="text-align: center; color: #999;">暂无课程数据，请点击"添加课程"</td>
             </tr>
             </tbody>
         </table>

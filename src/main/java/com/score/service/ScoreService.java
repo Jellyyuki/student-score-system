@@ -1,14 +1,25 @@
 package com.score.service;
 
 import com.score.entity.Score;
+import com.score.entity.ScoreStatisticsVO;
+
 import java.util.List;
 
 public interface ScoreService {
-    List<Score> findAllWithInfo();           // 获取所有成绩（带学生课程信息）
-    List<Score> search(String keyword);      // 模糊搜索成绩
+
+    List<Score> findAll();
+
+    List<Score> findAllWithInfo();
+
+    List<Score> searchWithInfo(String keyword);
+
     Score findById(Integer id);
-    void save(Score score) throws Exception;  // 添加，可能抛出重复异常
+
+    void save(Score score);
+
     void update(Score score);
+
     void deleteById(Integer id);
-    boolean isExist(Integer studentId, Integer courseId); // 检查是否已存在
+
+    ScoreStatisticsVO getStatistics();
 }

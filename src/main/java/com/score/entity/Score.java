@@ -12,13 +12,12 @@ public class Score {
     private String courseName;
     private String courseNo;
 
-    //构造方法
-    public Score(){
+    // 构造方法
+    public Score() {
 
     }
 
-    //getter/setter
-
+    // ========== getter 和 setter ==========
 
     public Integer getId() {
         return id;
@@ -28,12 +27,12 @@ public class Score {
         this.id = id;
     }
 
-    public Double getScore() {
-        return score;
+    public Integer getStudentId() {
+        return studentId;
     }
 
-    public void setScore(Double score) {
-        this.score = score;
+    public void setStudentId(Integer studentId) {
+        this.studentId = studentId;
     }
 
     public Integer getCourseId() {
@@ -44,12 +43,44 @@ public class Score {
         this.courseId = courseId;
     }
 
-    public Integer getStudentId() {
-        return studentId;
+    public Double getScore() {
+        return score;
     }
 
-    public void setStudentId(Integer studentId) {
-        this.studentId = studentId;
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public String getStudentNo() {
+        return studentNo;
+    }
+
+    public void setStudentNo(String studentNo) {
+        this.studentNo = studentNo;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getCourseNo() {
+        return courseNo;
+    }
+
+    public void setCourseNo(String courseNo) {
+        this.courseNo = courseNo;
     }
 
     @Override

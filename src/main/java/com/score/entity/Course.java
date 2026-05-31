@@ -5,10 +5,14 @@ public class Course {
         private String courseNo;
         private String courseName;
         private Integer credit;
-        //构建方法
+        private String status;  // 新增：课程状态（进行中/已结束）
+        private Integer studentCount;  // 新增：选课人数（非数据库字段，用于展示）
+
+        // 构造方法
         public Course() {
         }
 
+        // getter 和 setter
         public Integer getId() {
                 return id;
         }
@@ -41,8 +45,25 @@ public class Course {
                 this.credit = credit;
         }
 
+        public String getStatus() {
+                return status;
+        }
+
+        public void setStatus(String status) {
+                this.status = status;
+        }
+
+        public Integer getStudentCount() {
+                return studentCount;
+        }
+
+        public void setStudentCount(Integer studentCount) {
+                this.studentCount = studentCount;
+        }
+
         @Override
         public String toString() {
-                return "Course{id=" + id + ", courseNo='" + courseNo + "', courseName='" + courseName + "', credit=" + credit + "}";
+                return "Course{id=" + id + ", courseNo=" + courseNo + ", courseName=" + courseName +
+                        ", credit=" + credit + ", status=" + status + "}";
         }
 }

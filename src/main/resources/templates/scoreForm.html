@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${score.id == null} ? '录入成绩' : '编辑成绩'">成绩表单</title>
+    <title th:if="${score.id == null}">录入成绩 - 成绩管理系统</title>
+    <title th:if="${score.id != null}">编辑成绩 - 成绩管理系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
@@ -29,69 +30,80 @@
             text-decoration: none;
             transition: background 0.3s;
         }
-        .sidebar-menu li a:hover,
-        .sidebar-menu li a.active {
+        .sidebar-menu li a:hover {
             background-color: #1abc9c;
             color: white;
         }
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 20px 30px;
             background-color: #fff;
         }
         .form-container {
             max-width: 600px;
             margin: 0 auto;
-            background: #f9f9f9;
-            padding: 20px 30px;
+            background: #fff;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .form-group {
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
         }
         .form-group label {
-            width: 100px;
+            display: block;
+            margin-bottom: 8px;
             font-weight: bold;
             color: #333;
         }
-        .form-group select, .form-group input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #ccc;
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 16px;
         }
-        .form-actions {
-            margin-top: 30px;
-            text-align: center;
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #1abc9c;
         }
-        button {
-            padding: 8px 20px;
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
             background-color: #337ab7;
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 15px;
         }
-        button:hover { background-color: #286090; }
-        .back-link {
-            margin-left: 15px;
-            text-decoration: none;
-            color: #337ab7;
+        .btn-primary:hover {
+            background-color: #286090;
         }
-        .back-link:hover { text-decoration: underline; }
-        h2 { text-align: center; margin-bottom: 30px; color: #2c3e50; }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        h2 { margin-bottom: 20px; color: #2c3e50; text-align: center; }
         .alert-error {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             margin-bottom: 15px;
-            text-align: center;
         }
     </style>
 </head>
@@ -102,37 +114,44 @@
         <ul class="sidebar-menu">
             <li><a href="/students/list">👨‍🎓 学生管理</a></li>
             <li><a href="/courses/list">📖 课程管理</a></li>
-            <li><a href="/scores/list" class="active">📊 成绩管理</a></li>
+            <li><a href="/scores/list">📊 成绩管理</a></li>
             <li style="margin-top: 40px;"><a href="/logout">🚪 退出登录</a></li>
         </ul>
     </div>
     <div class="main-content">
         <div class="form-container">
-            <h2 th:text="${score.id == null} ? '录入成绩' : '编辑成绩'"></h2>
+            <h2 th:if="${score.id == null}">📝 录入成绩</h2>
+            <h2 th:if="${score.id != null}">✏️ 编辑成绩</h2>
+
             <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
             <form th:action="@{/scores/save}" th:object="${score}" method="post">
                 <input type="hidden" th:field="*{id}" />
+
                 <div class="form-group">
-                    <label>学生：</label>
+                    <label>学生姓名 *</label>
                     <select th:field="*{studentId}" required>
-                        <option value="">-- 请选择学生 --</option>
-                        <option th:each="stu : ${students}" th:value="${stu.id}" th:text="${stu.name} + ' (' + stu.studentNo + ')'"></option>
+                        <option value="">请选择学生</option>
+                        <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.name}"></option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label>课程：</label>
+                    <label>课程名称 *</label>
                     <select th:field="*{courseId}" required>
-                        <option value="">-- 请选择课程 --</option>
-                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.courseName} + ' (' + c.courseNo + ')'"></option>
+                        <option value="">请选择课程</option>
+                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.courseName}"></option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label>分数：</label>
-                    <input type="number" step="0.5" th:field="*{score}" required />
+                    <label>成绩 *</label>
+                    <input type="number" th:field="*{score}" min="0" max="100" step="1" required placeholder="请输入0-100之间的分数" />
                 </div>
-                <div class="form-actions">
-                    <button type="submit">保存</button>
-                    <a href="/scores/list" class="back-link">返回列表</a>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">💾 保存</button>
+                    <a href="/scores/list" class="btn btn-secondary">↩️ 返回列表</a>
                 </div>
             </form>
         </div>
