@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>教师管理 - 成绩管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        .sidebar-header { padding: 20px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #34495e; }
+        .sidebar-menu { list-style: none; padding: 0; }
+        .sidebar-menu li a {
+            display: block;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background-color: #1abc9c;
+            color: white;
+        }
+        .main-content { flex: 1; padding: 20px 30px; background-color: #fff; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 4px 10px; text-decoration: none; border-radius: 4px; margin: 0 2px; display: inline-block; font-size: 13px; }
+        .btn-danger { background-color: #d9534f; color: white; }
+        .btn-primary { background-color: #337ab7; color: white; }
+        .btn-success { background-color: #5cb85c; color: white; }
+        .search-box { margin: 20px 0; display: flex; justify-content: space-between; }
+        .search-box input { width: 300px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
+        h2 { color: #2c3e50; }
+        .alert-success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        .alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="sidebar">
+        <div class="sidebar-header">📚 学生成绩管理系统</div>
+        <ul class="sidebar-menu">
+            <li><a href="/students/list">👨‍🎓 学生管理</a></li>
+            <li><a href="/courses/list">📖 课程管理</a></li>
+            <li><a href="/scores/list">📊 成绩管理</a></li>
+            <li><a href="/teachers/list" class="active">👨‍🏫 教师管理</a></li>
+            <li><a href="/classes/list">🏫 班级管理</a></li>
+            <li style="margin-top: 40px;"><a href="/logout">🚪 退出登录</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>教师信息列表</h2>
+        <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
+        <div class="search-box">
+            <form method="get" action="/teachers/list" style="display: flex; gap: 10px;">
+                <input type="text" name="keyword" placeholder="姓名/工号" th:value="${keyword}" />
+                <button type="submit" class="btn btn-primary">查询</button>
+                <a href="/teachers/list" class="btn btn-primary">重置</a>
+            </form>
+            <a href="/teachers/add" class="btn btn-success">添加教师</a>
+        </div>
+
+        <table>
+            <thead>
+            <tr><th>ID</th><th>工号</th><th>姓名</th><th>性别</th><th>职称</th><th>院系</th><th>电话</th><th>邮箱</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${teachers}">
+                <td th:text="${t.id}">?</td>
+                <td th:text="${t.teacherNo}">?</td>
+                <td th:text="${t.name}">?</td>
+                <td th:text="${t.gender}">?</td>
+                <td th:text="${t.title}">?</td>
+                <td th:text="${t.department}">?</td>
+                <td th:text="${t.phone}">?</td>
+                <td th:text="${t.email}">?</td>
+                <td>
+                    <a th:href="@{/teachers/edit/{id}(id=${t.id})}" class="btn btn-primary">编辑</a>
+                    <a th:href="@{/teachers/delete/{id}(id=${t.id})}" class="btn btn-danger" onclick="return confirm('确定删除吗？')">删除</a>
+                </td>
+            </tr>
+            <tr th:if="${teachers.empty}">
+                <td colspan="9" style="text-align:center;color:#999;">暂无教师数据</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

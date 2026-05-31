@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>课程管理 - 成绩管理系统</title>
+    <title>班级管理 - 成绩管理系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
@@ -66,8 +66,6 @@
         .btn-primary:hover { background-color: #286090; }
         .btn-success { background-color: #5cb85c; color: white; }
         .btn-success:hover { background-color: #4cae4c; }
-        .btn-warning { background-color: #f0ad4e; color: white; }
-        .btn-warning:hover { background-color: #ec971f; }
         .search-box {
             margin: 20px 0;
             display: flex;
@@ -84,12 +82,6 @@
         }
         .search-box input {
             width: 250px;
-            padding: 8px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        .search-box select {
             padding: 8px 12px;
             font-size: 14px;
             border-radius: 4px;
@@ -115,24 +107,12 @@
             border-radius: 4px;
             margin-bottom: 15px;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
+        .badge {
+            background-color: #1abc9c;
+            color: white;
+            padding: 4px 8px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: bold;
-        }
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .status-closed {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .student-count {
-            font-weight: bold;
-            color: #1abc9c;
         }
     </style>
 </head>
@@ -145,64 +125,55 @@
             <li><a href="/courses/list">📖 课程管理</a></li>
             <li><a href="/scores/list">📊 成绩管理</a></li>
             <li><a href="/teachers/list">👨‍🏫 教师管理</a></li>
-            <li><a href="/classes/list">🏫 班级管理</a></li>
+            <li><a href="/classes/list" class="active">🏫 班级管理</a></li>
             <li style="margin-top: 40px;"><a href="/logout">🚪 退出登录</a></li>
         </ul>
     </div>
     <div class="main-content">
-        <h2>课程列表</h2>
+        <h2>班级信息列表</h2>
         <div th:if="${success}" class="alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert-error" th:text="${error}"></div>
 
         <div class="search-box">
             <div class="search-left">
-                <form method="get" action="/courses/list" style="display: flex; gap: 10px;">
-                    <input type="text" name="keyword" placeholder="输入课程名称或编号" th:value="${keyword}" />
+                <form method="get" action="/classes/list" style="display: flex; gap: 10px;">
+                    <input type="text" name="keyword" placeholder="班级名称/编号" th:value="${keyword}" />
                     <button type="submit" class="btn btn-primary">查询</button>
-                </form>
-
-                <form method="get" action="/courses/list" style="display: flex; gap: 10px;">
-                    <select name="status" onchange="this.form.submit()">
-                        <option value="">全部</option>
-                        <option value="进行中" th:selected="${currentStatus == '进行中'}">进行中</option>
-                        <option value="已结束" th:selected="${currentStatus == '已结束'}">已结束</option>
-                    </select>
+                    <a href="/classes/list" class="btn btn-primary">重置</a>
                 </form>
             </div>
-            <a href="/courses/add" class="btn btn-success">添加课程</a>
+            <a href="/classes/add" class="btn btn-success">添加班级</a>
         </div>
 
         <table>
             <thead>
             <tr>
                 <th>ID</th>
-                <th>课程编号</th>
-                <th>课程名称</th>
-                <th>学分</th>
-                <th>选课人数</th>
-                <th>课程状态</th>
+                <th>班级编号</th>
+                <th>班级名称</th>
+                <th>年级</th>
+                <th>专业</th>
+                <th>班主任</th>
+                <th>学生人数</th>
                 <th>操作</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="c : ${courses}">
-                <td th:text="${c.id}"></td>
-                <td th:text="${c.courseNo}"></td>
-                <td th:text="${c.courseName}"></td>
-                <td th:text="${c.credit}"></td>
-                <td class="student-count" th:text="${c.studentCount} + '人'"></td>
+            <tr th:each="c : ${classes}">
+                <td th:text="${c.id}">?</td>
+                <td th:text="${c.classNo}">?</td>
+                <td th:text="${c.className}">?</td>
+                <td th:text="${c.grade}">?</td>
+                <td th:text="${c.major}">?</td>
+                <td th:text="${c.headteacherName}">?</td>
+                <td><span class="badge" th:text="${c.studentCount} + '人'">0人</span></td>
                 <td>
-                    <span th:class="${c.status == '进行中'} ? 'status-badge status-active' : 'status-badge status-closed'" th:text="${c.status}"></span>
-                </td>
-                <td>
-                    <a th:href="@{/courses/edit/{id}(id=${c.id})}" class="btn btn-primary">编辑</a>
-                    <a th:href="@{/courses/delete/{id}(id=${c.id})}" class="btn btn-danger" onclick="return confirm('确定删除该课程吗？')">删除</a>
-                    <a th:if="${c.status == '进行中'}" th:href="@{/courses/updateStatus(id=${c.id}, status='已结束')}" class="btn btn-warning" onclick="return confirm('确定结束该课程吗？')">结束</a>
-                    <a th:if="${c.status == '已结束'}" th:href="@{/courses/updateStatus(id=${c.id}, status='进行中')}" class="btn btn-success" onclick="return confirm('确定重新开课吗？')">开课</a>
+                    <a th:href="@{/classes/edit/{id}(id=${c.id})}" class="btn btn-primary">编辑</a>
+                    <a th:href="@{/classes/delete/{id}(id=${c.id})}" class="btn btn-danger" onclick="return confirm('确定删除该班级吗？')">删除</a>
                 </td>
             </tr>
-            <tr th:if="${courses.empty}">
-                <td colspan="7" style="text-align: center; color: #999;">暂无课程数据，请点击"添加课程"</td>
+            <tr th:if="${classes.empty}">
+                <td colspan="8" style="text-align: center; color: #999;">暂无班级数据，请点击"添加班级"</td>
             </tr>
             </tbody>
         </table>
